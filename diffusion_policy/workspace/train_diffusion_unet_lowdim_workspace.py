@@ -120,7 +120,8 @@ class TrainDiffusionUnetLowdimWorkspace(BaseWorkspace):
             output_dir=self.output_dir)
         #print("aaaaaaaaaaaaaa")
         assert isinstance(env_runner, BaseLowdimRunner)
-
+        
+    
         # configure logging
         wandb_run = wandb.init(
             dir=str(self.output_dir),
