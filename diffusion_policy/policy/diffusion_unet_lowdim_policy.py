@@ -83,12 +83,21 @@ class DiffusionUnetLowdimPolicy(BaseLowdimPolicy):
             model_output = model(trajectory, t, 
                 local_cond=local_cond, global_cond=global_cond)
 
-            # 3. compute previous image: x_t -> x_t-1
+            # # 3. compute previous image: x_t -> x_t-1
+            # trajectory = scheduler.step(
+            #     model_output, t, trajectory, 
+            #     generator=generator,
+            #     **kwargs
+            #     ).prev_sample
+
+            step_kwargs = kwargs.copy()
+            if 'cond_predict_scale' in step_kwargs:
+                del step_kwargs['cond_predict_scale']
+            
             trajectory = scheduler.step(
                 model_output, t, trajectory, 
-                generator=generator,
-                **kwargs
-                ).prev_sample
+                generator=generator
+            ).prev_sample
         
         # finally make sure conditioning is enforced
         trajectory[condition_mask] = condition_data[condition_mask]        
@@ -183,9 +192,13 @@ class DiffusionUnetLowdimPolicy(BaseLowdimPolicy):
     def compute_loss(self, batch):
         # normalize input
         assert 'valid_mask' not in batch
+        # print("🔍 obs:", batch['obs'].shape)
+        # print("🔍 action:", batch['action'].shape)
         nbatch = self.normalizer.normalize(batch)
         obs = nbatch['obs']
         action = nbatch['action']
+        # print("🔍 obs.shape:", obs.shape)
+        # print("🔍 action.shape:", action.shape)
 
         # handle different ways of passing observation
         local_cond = None
@@ -205,9 +218,15 @@ class DiffusionUnetLowdimPolicy(BaseLowdimPolicy):
                     start = To - 1
                 end = start + self.n_action_steps
                 trajectory = action[:,start:end]
+            else:
+                # 👇 반드시 이걸 추가해야 함
+                trajectory = torch.cat([obs, action], dim=-1)
         else:
             trajectory = torch.cat([action, obs], dim=-1)
-
+        
+        #주석 추가
+        # print("🔍 trajectory.shape:", trajectory.shape)
+        # print("➡️ expected D:", self.action_dim + self.obs_dim)
         # generate impainting mask
         if self.pred_action_steps_only:
             condition_mask = torch.zeros_like(trajectory, dtype=torch.bool)

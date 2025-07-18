@@ -65,8 +65,16 @@ class RobomimicLowdimRunner(BaseLowdimRunner):
             past_action=False,
             abs_action=False,
             tqdm_interval_sec=5.0,
-            n_envs=None
+            n_envs=None,
+            #lite_physics=False,  # ← 혹시 쓰고 있다면 유지
+            **kwargs 
         ):
+        # print("✅ RobomimicLowdimRunner received init kwargs:")
+        # import inspect
+        # frame = inspect.currentframe()
+        # args, _, _, values = inspect.getargvalues(frame)
+        # for i in args:
+        #     print(f"  {i} = {values[i]}")
         """
         Assuming:
         n_obs_steps=2
@@ -84,7 +92,7 @@ class RobomimicLowdimRunner(BaseLowdimRunner):
         | | | | | |i|i|i| | | | |
         | | | | | | | | |a|a|a|a|
         """
-
+        
         super().__init__(output_dir)
 
         if n_envs is None:
@@ -108,6 +116,17 @@ class RobomimicLowdimRunner(BaseLowdimRunner):
         if abs_action:
             env_meta['env_kwargs']['controller_configs']['control_delta'] = False
             rotation_transformer = RotationTransformer('axis_angle', 'rotation_6d')
+        
+        # Remove lite_physics parameter if it exists in env_kwargs
+        if 'lite_physics' in env_meta['env_kwargs']:
+            del env_meta['env_kwargs']['lite_physics']
+        if "interpolation" not in env_meta['env_kwargs']['controller_configs']:
+            env_meta['env_kwargs']['controller_configs']["interpolation"] = "linear"
+        if "ramp_ratio" not in env_meta['env_kwargs']['controller_configs']:
+            env_meta['env_kwargs']['controller_configs']["ramp_ratio"] = 0.2
+        # Fix controller type if it's BASIC
+        if env_meta['env_kwargs']['controller_configs'].get("type", "").upper() == "BASIC":
+            env_meta['env_kwargs']['controller_configs']["type"] = "OSC_POSE"
 
         def env_fn():
             robomimic_env = create_env(

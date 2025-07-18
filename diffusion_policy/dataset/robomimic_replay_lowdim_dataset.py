@@ -126,6 +126,8 @@ class RobomimicReplayLowdimDataset(BaseLowdimDataset):
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         data = self.sampler.sample_sequence(idx)
         torch_data = dict_apply(data, torch.from_numpy)
+        # print("🔍 torch_data['obs'].shape:", torch_data['obs'].shape)
+        # print("🔍 torch_data['action'].shape:", torch_data['action'].shape)
         return torch_data
 
 def normalizer_from_stat(stat):
@@ -139,6 +141,8 @@ def normalizer_from_stat(stat):
     )
     
 def _data_to_obs(raw_obs, raw_actions, obs_keys, abs_action, rotation_transformer):
+    #print("✅ Using obs_keys:", obs_keys)
+
     obs = np.concatenate([
         raw_obs[key] for key in obs_keys
     ], axis=-1).astype(np.float32)
@@ -165,4 +169,6 @@ def _data_to_obs(raw_obs, raw_actions, obs_keys, abs_action, rotation_transforme
         'obs': obs,
         'action': raw_actions
     }
+    # print("🔍 data['obs'].shape:", data['obs'].shape)
+    # print("🔍 data['action'].shape:", data['action'].shape)
     return data

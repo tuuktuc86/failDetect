@@ -73,6 +73,7 @@ class TrainDiffusionUnetLowdimWorkspace(BaseWorkspace):
         # configure dataset
         dataset: BaseLowdimDataset
         dataset = hydra.utils.instantiate(cfg.task.dataset)
+        #print("🔍 dataset:", cfg.task.dataset)
         assert isinstance(dataset, BaseLowdimDataset)
         train_dataloader = DataLoader(dataset, **cfg.dataloader)
         normalizer = dataset.get_normalizer()
@@ -104,12 +105,20 @@ class TrainDiffusionUnetLowdimWorkspace(BaseWorkspace):
             ema = hydra.utils.instantiate(
                 cfg.ema,
                 model=self.ema_model)
-
-        # configure env runner
+        #env_runner 주석
+        #configure env runner
         env_runner: BaseLowdimRunner
+        # print("✅ env_runner 확인")
+        # print(cfg.task.env_runner)
+        if 'lite_physics' in cfg.task.env_runner:
+            print("❌ Removing unexpected 'lite_physics' key from env_runner config...")
+            del cfg.task.env_runner['lite_physics']
+        #print("✅ env_runner config just before instantiate:")
+        #print(OmegaConf.to_yaml(cfg.task.env_runner))
         env_runner = hydra.utils.instantiate(
             cfg.task.env_runner,
             output_dir=self.output_dir)
+        #print("aaaaaaaaaaaaaa")
         assert isinstance(env_runner, BaseLowdimRunner)
 
         # configure logging
@@ -121,7 +130,8 @@ class TrainDiffusionUnetLowdimWorkspace(BaseWorkspace):
         wandb.config.update(
             {
                 "output_dir": self.output_dir,
-            }
+            },
+            allow_val_change=True,
         )
 
         # configure checkpoint
@@ -165,6 +175,8 @@ class TrainDiffusionUnetLowdimWorkspace(BaseWorkspace):
                             train_sampling_batch = batch
 
                         # compute loss
+                        # print("🔍 obs1:", batch['obs'].shape)
+                        # print("🔍 action1:", batch['action'].shape)    
                         raw_loss = self.model.compute_loss(batch)
                         loss = raw_loss / cfg.training.gradient_accumulate_every
                         loss.backward()

@@ -60,6 +60,10 @@ class LowdimMaskGenerator(ModuleAttrMixin):
     def forward(self, shape, seed=None):
         device = self.device
         B, T, D = shape
+        # print("🔍 shape:", shape)
+        # print("🔍 D:", D)
+        # print("🔍 self.action_dim:", self.action_dim)
+        # print("🔍 self.obs_dim:", self.obs_dim)
         assert D == (self.action_dim + self.obs_dim)
 
         # create all tensors on this device
@@ -218,4 +222,5 @@ def test():
     # kmg = KeypointMaskGenerator(2,2, random_obs_steps=True)
     # self = KeypointMaskGenerator(2,2,context_dim=2, action_visible=True)
     # self = KeypointMaskGenerator(2,2,context_dim=0, action_visible=True)
-    self = LowdimMaskGenerator(2,20, max_n_obs_steps=3, action_visible=True)
+    #self = LowdimMaskGenerator(2,20, max_n_obs_steps=3, action_visible=True)
+    self = LowdimMaskGenerator(7,45, max_n_obs_steps=3, action_visible=True)
