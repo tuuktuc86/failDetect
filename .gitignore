@@ -15,8 +15,8 @@ __pycache__/
 *.cpython
 *.png
 ref_for_myself.md
-data/
-data/*
+data/outputs/*
+data/robomimic/*
 *.hdf5
 
 # Large files and directories
