@@ -1,1 +1,2 @@
 
+python train.py   --config-dir=diffusion_policy/configs_robomimic   --config-name=image_square_ph_lowDim_diffusion_policy_cnn.yaml   training.seed=1103   training.device=cuda:0   hydra.run.dir="data/outputs/new_training_$(date +%s)"

@@ -1,7 +1,7 @@
 import h5py
 
 # 데이터셋 경로
-hdf5_path = "data/robomimic/datasets/square/ph/low_dim_v15.hdf5"
+hdf5_path = "/home/user/Desktop/project/FAIL-Detect/data/robomimic/datasets/can/low_dim_v15.hdf5"
 demo_id = "demo_0"
 
 with h5py.File(hdf5_path, "r") as f:
