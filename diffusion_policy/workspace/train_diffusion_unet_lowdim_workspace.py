@@ -176,8 +176,7 @@ class TrainDiffusionUnetLowdimWorkspace(BaseWorkspace):
                             train_sampling_batch = batch
 
                         # compute loss
-                        # print("🔍 obs1:", batch['obs'].shape)
-                        # print("🔍 action1:", batch['action'].shape)    
+                        
                         raw_loss = self.model.compute_loss(batch)
                         loss = raw_loss / cfg.training.gradient_accumulate_every
                         loss.backward()

@@ -42,7 +42,7 @@ n_action_steps: 8
 n_latency_steps: 0
 n_obs_steps: 2
 name: train_diffusion_unet_visual
-obs_as_global_cond: false
+obs_as_local_cond: true
 optimizer:
   _target_: torch.optim.AdamW
   betas:
@@ -52,13 +52,13 @@ optimizer:
   lr: 0.0001
   weight_decay: 1.0e-06
 past_action_visible: false
-pred_action_steps_only: true #내가추가함
+#pred_action_steps_only: true #내가추가함
 policy:
   _target_: diffusion_policy.policy.diffusion_unet_lowdim_policy.DiffusionUnetLowdimPolicy
   model:  # ❗ 반드시 있어야 함
     _target_: diffusion_policy.model.diffusion.conditional_unet1d.ConditionalUnet1D
-    input_dim: 33
-    global_cond_dim: 0
+    input_dim: 10
+    global_cond_dim: 46
   cond_predict_scale: true
   #diffusion_step_embed_dim: 128
   down_dims:
@@ -83,7 +83,8 @@ policy:
     prediction_type: epsilon
     variance_type: fixed_small
   num_inference_steps: 100
-  obs_as_global_cond: false
+  obs_as_local_cond: false
+  obs_as_global_cond: true
   obs_encoder_group_norm: true
   shape_meta:
     action:

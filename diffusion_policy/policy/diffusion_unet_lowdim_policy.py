@@ -218,9 +218,7 @@ class DiffusionUnetLowdimPolicy(BaseLowdimPolicy):
                     start = To - 1
                 end = start + self.n_action_steps
                 trajectory = action[:,start:end]
-            else:
-                # 👇 반드시 이걸 추가해야 함
-                trajectory = torch.cat([obs, action], dim=-1)
+            
         else:
             trajectory = torch.cat([action, obs], dim=-1)
         
